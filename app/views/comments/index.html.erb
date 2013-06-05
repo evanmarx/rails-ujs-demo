@@ -1,28 +1,90 @@
 <h1>Comments</h1>
 
-<%= form_for(Comment.new, remote: true, html: {id: "comment-form"}) do |f| %>
-  <div class="field">
-    <%= f.label :text, "Write a new comment..." %><br>
-    <%= f.text_area :text %>
-  </div>
-  <div class="actions">
-    <%= f.submit %>
-  </div>
+<!-- Note the "remote: true" setting and html id, needed for Rails UJS. -->
+<%= form_for(@comment, remote: true, html: {id: "comment-form"}) do |f| %>
+  <%= f.label :text, "Write a new comment..." %><br>
+  <%= f.text_area :text %><br>
+  <%= f.submit %>
 <% end %>
 
+
+<h2>My wall</h2>
+
+<!-- Have a container tag for your partials, to which you can prepend. -->
 <section class="comments">
-<%= render @comments %>
+
+  <!-- Use partials. -->
+  <%= render @comments %>
+
 </section>
+
 
 <script>
 
+// I'm putting this js inline for demonstration purpose,
+// but you should probably put this in a namespaced library file.
+
 $(document).ready(function(){
   
+  // Using Rails UJS, bind an event listener to the form
+  // Read more about UJS Ajax events here:
+  // https://github.com/rails/jquery-ujs/wiki/ajax
   $("#comment-form").on("ajax:success", function(event, data){
-    $(".comments").prepend($data);
+    
+    // We want the data passed in to be a single rendered partial.
+    // That way we can easily prepend it to the container tag.
+    $(".comments").prepend(data);
+    
+    // Don't forget to clear out your form fields.
+    $("#comment-form textarea").val("");
+    
   });
   
-});
+  
 
+  // The manual way to do this without UJS.
+  // You should understand this equally well.
+  // 
+  // $("#comment-form").on("submit", function(event){
+  //   
+  //   event.preventDefault();
+  //   
+  //   $.post(
+  //     $("#comment-form").attr("action"),
+  //     $("#comment-form").serialize(),
+  //     function(data){
+  //       
+  //       $(".comments").prepend(data);
+  //       $("#comment-form textarea").val("");
+  //       
+  //     }
+  //   );
+  //   
+  // });
+  
+  
+  
+  // Improved manual version using a form variable.
+  // 
+  // $("#comment-form").on("submit", function(event){
+  //   
+  //   event.preventDefault();
+  //   
+  //   var form = $(this);
+  //   
+  //   $.post(
+  //     form.attr("action"),
+  //     form.serialize(),
+  //     function(data){
+  //       
+  //       $(".comments").prepend(data);
+  //       form.find("textarea").val("");
+  //       
+  //     }
+  //   );
+  //   
+  // });
+
+});
 
 </script>

@@ -1,4 +1,10 @@
-<article class="comment">
+<article>
   <div><%= comment.text %></div>
+  
+  <small>
+    <strong>Jonathan</strong>
+    <time><%= time_ago_in_words(comment.created_at) %> ago</time>
+  </small>
+  
   <hr>
 </article>
